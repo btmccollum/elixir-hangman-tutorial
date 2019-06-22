@@ -20,4 +20,13 @@ defmodule GameTest do
     assert word == String.downcase(word)
   end
 
+  test "state isn't changed for :won or :lost games" do
+    for state <- [ :won, :lost ] do
+      game = Game.new_game()
+      |> Map.put(:game_state, :won)
+
+      # pinning the game, so only valid if the game from agove matches
+      assert { ^game, _ } = Game.make_move(game, "X")
+    end
+  end
 end
