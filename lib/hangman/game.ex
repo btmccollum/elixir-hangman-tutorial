@@ -6,7 +6,7 @@ defmodule Hangman.Game do
     turns_left:     7,
     game_state:     :initializing,
     word_to_guess:  [],
-    guessed:        MapSet.new(),
+    guessed:        [],
   )
   def new_game() do
     # word being guessed
@@ -34,7 +34,7 @@ defmodule Hangman.Game do
   end
 
   def make_move(game, guess) do
-    game = accept_move(game, guess, MapSet.member?(game.guessed, guess))
+    game = accept_move(game, guess, Enum.member?(game.guessed, guess))
     { game, tally(game) }
   end
 
@@ -44,7 +44,7 @@ defmodule Hangman.Game do
   end
 
   def accept_move(game, guess, _already_guessed) do
-    Map.put(game, :guessed, MapSet.put(game.guessed, guess))
+    Map.put(game, :guessed, [ guess | game.guessed])
   end
 
   def tally(game) do
