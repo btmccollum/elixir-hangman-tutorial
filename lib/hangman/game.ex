@@ -8,27 +8,16 @@ defmodule Hangman.Game do
     word_to_guess:  [],
     guessed:        MapSet.new(),
   )
-  def new_game() do
-    # word being guessed
-    # turns left
-    # letters being guessed
-
-    # putting the name of the structure between % and {} (map) utilizes the structure defined above
+  def new_game(word) do
     %Hangman.Game{
-      word_to_guess: Dictionary.random_word |> String.codepoints
+      word_to_guess: word |> String.codepoints
     }
   end
 
-  # pattern matching for similar functions
-  # def make_move(game = %{ game_state: :won}, _guess) do
-  #   { game, tally(game) }
-  # end
+  def new_game() do
+    new_game(Dictionary.random_word)
+  end
 
-  # def make_move(game = %{ game_state: :lost}, _guess) do
-  #   { game, tally(game) }
-  # end
-
-  # combined version with when clause
   def make_move(game = %{ game_state: state }, _guess) when state in [:won, :lost] do
     { game, tally(game) }
   end
@@ -45,12 +34,28 @@ defmodule Hangman.Game do
 
   def accept_move(game, guess, _already_guessed) do
     Map.put(game, :guessed, MapSet.put(game.guessed, guess))
+    |> score_guess(Enum.member?(game.word_to_guess, guess))
+  end
+
+  def score_guess(game, _good_guess = true) do
+    new_state = MapSet.new(game.word_to_guess)
+    |> MapSet.subset?(game.guessed)
+    |> maybe_won()
+    Map.put(game, :game_state, new_state)
+  end
+
+  def score_guess(game, _not_good_guess) do
+  #   dec turns left
+  #   0? :lost, :bad_guess
+    game
   end
 
   def tally(game) do
     123
   end
 
+  def maybe_won(true), do: :won
+  def maybe_won(_),    do: :good_guess
 
 
 end
